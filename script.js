@@ -2,35 +2,51 @@
 // JavaScript code to add the fade-in effect
 
 document.addEventListener("DOMContentLoaded", function () {
-    const paragraphs = document.querySelectorAll(".fade-in");
-    
-    // Function to check if an element is in the viewport
-    function isInViewport(element) {
-        const rect = element.getBoundingClientRect();
-        return (
-            rect.top >= 0 &&
-            rect.bottom <= (window.innerHeight || document.documentElement.clientHeight)
-        );
-    }
+    const carousel = document.querySelector(".carousel");
+    const slides = document.querySelectorAll(".slide");
+    const navButtons = document.querySelectorAll(".nav-button");
+    let currentSlide = 0;
 
-    function handleScroll() {
-        paragraphs.forEach((paragraph, index) => {
-            if (isInViewport(paragraph) && !paragraph.classList.contains("fade-in-visible")) {
-                paragraph.style.animation = `fadeIn 1.5s ease-in-out ${index * 0.5}s forwards`;
-                paragraph.classList.add("fade-in-visible");
-            }
+    function showSlide(slideIndex) {
+        slides.forEach((slide, index) => {
+            slide.style.transform = `translateX(-${slideIndex * 100}%)`;
+        });
+        navButtons.forEach((button, index) => {
+            button.classList.toggle("active", index === slideIndex);
         });
     }
 
-    // Initial check when the page loads
-    handleScroll();
+    function navigateToSlide(slideIndex) {
+        if (slideIndex < 0) {
+            slideIndex = 0;
+        } else if (slideIndex >= slides.length) {
+            slideIndex = slides.length - 1;
+        }
+        currentSlide = slideIndex;
+        showSlide(currentSlide);
+    }
 
-    // Listen for scroll events
-    window.addEventListener("scroll", handleScroll);
+    function handleNavButtonClick(event) {
+        const targetSlide = parseInt(event.target.getAttribute("data-slide"));
+        if (!isNaN(targetSlide)) {
+            navigateToSlide(targetSlide);
+        }
+    }
+
+    function handleKeyboardNavigation(event) {
+        if (event.key === "ArrowLeft") {
+            navigateToSlide(currentSlide - 1);
+        } else if (event.key === "ArrowRight") {
+            navigateToSlide(currentSlide + 1);
+        }
+    }
+
+    showSlide(currentSlide);
+
+    // Attach event listeners
+    navButtons.forEach((button) => {
+        button.addEventListener("click", handleNavButtonClick);
+    });
+
+    document.addEventListener("keydown", handleKeyboardNavigation);
 });
-
-document.addEventListener("DOMContentLoaded", function() {
-    const nav = document.querySelector('nav');
-    nav.classList.add('fade-in-nav');
-});
-
